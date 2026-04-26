@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Love / Paranoia</title>
+<link rel="stylesheet" href="./loveparanoia.css">
+</head>
+<body>
+ 
+  <!-- =============================================
+       OVERLAYS (noise, vignette, scanlines)
+  ============================================= -->
+  <div id="noise"></div>
+  <div id="vignette"></div>
+  <div id="scanlines"></div>
+  <div id="red-bleed"></div>
+  <div id="fake-cursor"></div>
+  <div id="progress-bar"></div>
+ 
+  <!-- Floating paranoid thoughts (populated by JS) -->
+  <div id="thoughts-container"></div>
+ 
+  <!-- Paranoia meter (top right) -->
+  <div id="meter">
+    <div id="meter-label">paranoia</div>
+    <div id="meter-track"><div id="meter-fill"></div></div>
+  </div>
+ 
+  <!-- Scroll hint -->
+  <div id="hint">↓ scroll to descend ↓</div>
+ 
+  <!-- =============================================
+       MAIN SCROLL CONTENT
+  ============================================= -->
+  <div id="scroll-container">
+ 
+    <!-- PANEL 0 · OPENING -->
+    <section class="panel" id="opening">
+      <div id="orbit"></div>
+      <div class="lyric-block">
+        <h1 id="title-main" class="glitch-wrap" data-text="Love / Paranoia">Love / Paranoia</h1>
+        <p id="title-sub">Tame Impala · a descent into distortion</p>
+      </div>
+    </section>
+ 
+    <!-- PANEL 1 · ADMISSION — the walls going up, pretending it's fine -->
+    <section class="panel" id="panel-1">
+      <div class="lyric-block">
+        <p class="section-label">i.</p>
+        <div class="sep"></div>
+ 
+        <p class="lyric-line" data-original="I may not be as honest as I ought to be"
+                              data-distorted="I may not be — I'm not — I never was — honest—">
+          I may not be as honest as I ought to be
+        </p>
+        <p class="lyric-line" data-original="Now that, when the walls go up"
+                              data-distorted="The walls — when did they go up — were they always—">
+          Now that, when the walls go up
+        </p>
+        <p class="lyric-line" data-original="I said it didn't worry me but it hit me like an arrow"
+                              data-distorted="I said it didn't — but it did — it still does — arrow—">
+          I said it didn't worry me but it hit me like an arrow
+        </p>
+      </div>
+    </section>
+ 
+    <!-- PANEL 2 · THE QUESTION SURFACES — "babe, I could just be paranoid" -->
+    <section class="panel" id="panel-2">
+      <div class="lyric-block">
+        <p class="section-label">ii.</p>
+        <div class="sep"></div>
+ 
+        <p class="lyric-line" data-original="Babe, to know, I could just be paranoid"
+                              data-distorted="I could just be — could I — paranoid — or right—">
+          Babe, to know, I could just be paranoid
+        </p>
+        <p class="lyric-line" data-original="Won't quell the desire to know what was really going on"
+                              data-distorted="I need to know — what was really — tell me — what was—">
+          Won't quell the desire to know what was really going on
+        </p>
+        <p class="lyric-line" data-original='"Does it really f****** matter? Babe?" Is all you can ask me'
+                              data-distorted='"Does it matter" — it does — it does — why won\'t you say it does—'>
+          "Does it really f****** matter? Babe?" Is all you can ask me
+        </p>
+ 
+        <!-- First conflict: deflection vs. need -->
+        <div class="conflict-pair" id="conflict-1" style="margin-top: 3rem;">
+          <div class="conflict-a">you're overthinking</div>
+          <div class="conflict-b">they're deflecting</div>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- PANEL 3 · FAIR PLAY — he concedes, but the wound is open -->
+    <section class="panel" id="panel-3">
+      <div class="lyric-block">
+        <p class="section-label">iii.</p>
+        <div class="sep"></div>
+ 
+        <p class="lyric-line" data-original="Okay, fair play, here we go"
+                              data-distorted="Okay — is it okay — fair — nothing feels fair—">
+          Okay, fair play, here we go
+        </p>
+        <p class="lyric-line" data-original="I've heard those words before"
+                              data-distorted="I've heard them — again — always the same — before—">
+          I've heard those words before
+        </p>
+        <p class="lyric-line" data-original="Are you sure it was nothing"
+                              data-distorted="Are you sure — sure — nothing — how can nothing feel like this—">
+          Are you sure it was nothing
+        </p>
+        <p class="lyric-line" data-original="'Cause it made me feel like dying inside"
+                              data-distorted="It made me feel — dying — inside — still inside—">
+          'Cause it made me feel like dying inside
+        </p>
+ 
+        <!-- Echo copies of "before" bleeding through -->
+        <div class="echo" style="font-size:5rem; top:-1rem; left:-4rem; opacity:0;">before</div>
+        <div class="echo" style="font-size:2.5rem; bottom:1rem; right:-2rem; opacity:0;">before</div>
+      </div>
+    </section>
+ 
+    <!-- PANEL 4 · INSECURITY DISCOVERED — never thought I was, but I am -->
+    <section class="panel" id="panel-4">
+      <div class="lyric-block">
+        <p class="section-label">iv.</p>
+        <div class="sep"></div>
+ 
+        <p class="lyric-line" data-original="Never thought I was insecure"
+                              data-distorted="Never thought — but I am — I always was — insecure—">
+          Never thought I was insecure
+        </p>
+        <p class="lyric-line" data-original="But it's pure"
+                              data-distorted="It's pure — the fear is pure — purer than the love—">
+          But it's pure
+        </p>
+        <p class="lyric-line" data-original="Didn't notice until I was in love"
+                              data-distorted="Didn't notice — love revealed it — love broke it open—">
+          Didn't notice until I was in love
+        </p>
+        <p class="lyric-line" data-original="For real"
+                              data-distorted="For real — was it real — is any of this real—">
+          For real
+        </p>
+ 
+        <div class="conflict-pair" id="conflict-2" style="margin-top: 3rem;">
+          <div class="conflict-a">love made you vulnerable</div>
+          <div class="conflict-b">love made you dangerous</div>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- PANEL 5 · CROSSING THE LINE — the act of sabotage -->
+    <section class="panel" id="panel-5">
+      <div class="lyric-block">
+        <p class="section-label">v.</p>
+        <div class="sep"></div>
+ 
+        <p class="lyric-line" data-original="Am I really gonna cross the line"
+                              data-distorted="Am I — I already did — the line — I crossed it—">
+          Am I really gonna cross the line
+        </p>
+        <p class="lyric-line" data-original="Just to find what you're typing?"
+                              data-distorted="What are you — I have to know — what are you typing—">
+          Just to find what you're typing?
+        </p>
+        <p class="lyric-line" data-original="If only I could read your mind"
+                              data-distorted="Read your mind — I'm trying — why won't you let me—">
+          If only I could read your mind
+        </p>
+        <p class="lyric-line" data-original="Oh, I'd be fine, I'd be normal"
+                              data-distorted="I'd be fine — I wouldn't — nothing makes this fine—">
+          Oh, I'd be fine, I'd be normal
+        </p>
+        <p class="lyric-line" data-original="Now's my time, gonna do it"
+                              data-distorted="Do it — don't — I'm doing it — I can't stop—">
+          Now's my time, gonna do it
+        </p>
+ 
+        <div class="conflict-pair" id="conflict-3" style="margin-top: 3rem;">
+          <div class="conflict-a">don't look</div>
+          <div class="conflict-b">you have to look</div>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- PANEL 6 · TRUE LOVE BRINGS OUT THE WORST — the confession -->
+    <section class="panel" id="panel-6">
+      <div class="lyric-block">
+        <p class="section-label">vi.</p>
+        <div class="sep"></div>
+ 
+        <p class="lyric-line" data-original="And suddenly I'm the phoney one"
+                              data-distorted="Phoney — me — I made myself the villain—">
+          And suddenly I'm the phoney one
+        </p>
+        <p class="lyric-line" data-original="The only one with a problem"
+                              data-distorted="Only me — always me — the problem was always me—">
+          The only one with a problem
+        </p>
+        <p class="lyric-line" data-original="True love is bringing it out of me"
+                              data-distorted="True love — bringing what out — the worst — it's the worst—">
+          True love is bringing it out of me
+        </p>
+        <p class="lyric-line" data-original="The worst in me, and I know now"
+                              data-distorted="The worst — I know — I always knew — I ruined it—">
+          The worst in me, and I know now
+        </p>
+      </div>
+    </section>
+ 
+    <!-- PANEL 7 · THE OCEAN — the memory of what was real, before the rot -->
+    <section class="panel" id="panel-7">
+      <div class="lyric-block">
+        <p class="section-label">vii.</p>
+        <div class="sep"></div>
+ 
+        <p class="lyric-line" data-original="Do you remember the time we were"
+                              data-distorted="Do you remember — do you still — can you—">
+          Do you remember the time we were
+        </p>
+        <p class="lyric-line" data-original="The time we were by the ocean?"
+                              data-distorted="The ocean — we were — before all this — the ocean—">
+          The time we were by the ocean?
+        </p>
+        <p class="lyric-line" data-original="I didn't care if it was day or night"
+                              data-distorted="Day or night — I didn't — I only cared about you—">
+          I didn't care if it was day or night
+        </p>
+        <p class="lyric-line" data-original="The world was right where I wanted"
+                              data-distorted="The world was right — it was right — and I broke it—">
+          The world was right where I wanted
+        </p>
+ 
+        <!-- Echo of "ocean" bleeding through -->
+        <div class="echo" style="font-size:6rem; top:-2rem; right:-3rem; opacity:0;">ocean</div>
+        <div class="echo" style="font-size:3rem; bottom:0; left:-2rem; opacity:0;">ocean</div>
+      </div>
+    </section>
+ 
+    <!-- PANEL 8 · FINAL CHAOS — the hollow apology, the lie -->
+    <section class="panel" id="chaos-panel" style="min-height: 120vh; flex-direction: column; gap: 2rem;">
+      <div class="lyric-block" style="position: relative; z-index: 5;">
+        <p class="section-label" style="opacity:1; color: var(--red);">viii.</p>
+        <div class="sep" style="opacity:1;"></div>
+ 
+        <!-- The apology lines — styled to feel performative, not genuine -->
+        <p class="lyric-line visible" id="sorry-line-1"
+           style="color: var(--accent2); opacity:1; font-size: clamp(1.6rem, 4vw, 3rem);">
+          Girl I'm sorry
+        </p>
+        <p class="lyric-line visible" id="sorry-line-2"
+           style="color: var(--accent2); opacity: 0.7; font-size: clamp(1.3rem, 3.5vw, 2.4rem); margin-top: 0.3em;">
+          Babe I'm really, really sorry
+        </p>
+ 
+        <!-- The doubt underneath — appears after a delay, small, quiet -->
+        <p id="doubt-line"
+           style="font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.2em;
+                  color: var(--red); opacity: 0; margin-top: 2.5rem;
+                  transition: opacity 2s ease 1.5s; text-transform: uppercase;">
+          [ he'll do it again, don't fall for it... ]
+        </p>
+      </div>
+ 
+      <!-- Chaos words are placed by JS across the screen -->
+      <div id="chaos-words"></div>
+ 
+      <!-- Reset button -->
+      <button id="reset-btn">↑ begin again ↑</button>
+    </section>
+ 
+      <!-- Chaos words are placed by JS across the screen -->
+      <div id="chaos-words"></div>
+ 
+      <!-- Reset button -->
+      <button id="reset-btn">↑ begin again ↑</button>
+    </section>
+ 
+  </div><!-- end #scroll-container -->
+ 
+ 
+  <!-- =============================================
+       JAVASCRIPT — Paranoia Engine
+       ─────────────────────────────────────────
+       paranoiaLevel: 0–100
+         0–20:   calm, clean
+        20–40:   subtle distortions, hints appear
+        40–60:   conflicts visible, text glitches
+        60–80:   screen darkens, shakes, echoes
+        80–100:  full chaos
+  ============================================= -->
+<script src="./loveparanoia.js"></script>
+</body>
+</html>

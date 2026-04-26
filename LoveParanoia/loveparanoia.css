@@ -1,0 +1,568 @@
+   /* =============================================
+       FONTS & RESET
+    ============================================= */
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Space+Mono:ital@0;1&display=swap');
+ 
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+ 
+    /* =============================================
+       CSS VARIABLES — color palette & timing
+       All visual changes trace back to these.
+    ============================================= */
+    :root {
+      --bg:        #0d0a14;         /* deep space violet-black */
+      --bg-warm:   #1a0e1f;
+      --text:      #e8ddf0;
+      --accent:    #c084fc;         /* lavender */
+      --accent2:   #f0abfc;
+      --red:       #f87171;
+      --dim:       rgba(232,221,240,0.35);
+      --blur:      0px;
+      --hue-rot:   0deg;
+      --shake-x:   0px;
+      --shake-y:   0px;
+      --glitch-op: 0;
+      --noise-op:  0.04;
+      --vignette:  rgba(0,0,0,0.0);
+    }
+ 
+    /* =============================================
+       BODY & FULL-PAGE SETUP
+    ============================================= */
+    html { scroll-behavior: auto; }
+ 
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: default;
+      transition:
+        background-color 1.5s ease,
+        filter 0.4s ease;
+    }
+ 
+    /* =============================================
+       NOISE OVERLAY — grain texture that intensifies
+    ============================================= */
+    #noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      opacity: var(--noise-op);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 200px 200px;
+      mix-blend-mode: overlay;
+      transition: opacity 2s ease;
+    }
+ 
+    /* =============================================
+       VIGNETTE OVERLAY — darkens edges at high paranoia
+    ============================================= */
+    #vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 998;
+      background: radial-gradient(ellipse at center,
+        transparent 40%,
+        var(--vignette) 100%
+      );
+      transition: background 1.5s ease;
+    }
+ 
+    /* =============================================
+       SCANLINE OVERLAY — CRT flicker effect
+    ============================================= */
+    #scanlines {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 997;
+      opacity: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.07) 2px,
+        rgba(0,0,0,0.07) 4px
+      );
+      transition: opacity 2s ease;
+    }
+ 
+    /* =============================================
+       SCROLL PROGRESS BAR — subtle, not intrusive
+    ============================================= */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      z-index: 1000;
+      transition: width 0.1s linear, opacity 1s ease;
+    }
+ 
+    /* =============================================
+       INSTRUCTION HINT — fades out early on
+    ============================================= */
+    #hint {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--dim);
+      z-index: 100;
+      opacity: 1;
+      transition: opacity 2s ease;
+      text-transform: uppercase;
+    }
+ 
+    /* =============================================
+       MAIN SCROLL CONTAINER
+       Each .panel is a full-screen section
+    ============================================= */
+    #scroll-container {
+      position: relative;
+    }
+ 
+    .panel {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+ 
+    /*
+      Each panel has its own background, darkening as you descend.
+      ::before fades FROM the panel above; ::after bleeds INTO the next.
+      Together they create a seamless sink rather than hard cuts.
+    */
+    #opening     { background: hsl(270, 32%, 9%); }
+    #panel-1     { background: hsl(270, 33%, 8%); }
+    #panel-2     { background: hsl(270, 34%, 8%); }
+    #panel-3     { background: hsl(268, 35%, 7%); }
+    #panel-4     { background: hsl(266, 36%, 7%); }
+    #panel-5     { background: hsl(264, 38%, 6%); }
+    #panel-6     { background: hsl(262, 40%, 6%); }
+    #panel-7     { background: hsl(260, 42%, 5%); }
+    #chaos-panel { background: hsl(258, 44%, 5%); }
+ 
+    .panel::before,
+    .panel::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 200px;
+      pointer-events: none;
+      z-index: 1;
+    }
+ 
+    /* Top fade — blends from the panel above */
+    #panel-1::before     { top: 0; background: linear-gradient(to bottom, hsl(270,32%,9%),  transparent); }
+    #panel-2::before     { top: 0; background: linear-gradient(to bottom, hsl(270,33%,8%),  transparent); }
+    #panel-3::before     { top: 0; background: linear-gradient(to bottom, hsl(270,34%,8%),  transparent); }
+    #panel-4::before     { top: 0; background: linear-gradient(to bottom, hsl(268,35%,7%),  transparent); }
+    #panel-5::before     { top: 0; background: linear-gradient(to bottom, hsl(266,36%,7%),  transparent); }
+    #panel-6::before     { top: 0; background: linear-gradient(to bottom, hsl(264,38%,6%),  transparent); }
+    #panel-7::before     { top: 0; background: linear-gradient(to bottom, hsl(262,40%,6%),  transparent); }
+    #chaos-panel::before { top: 0; background: linear-gradient(to bottom, hsl(260,42%,5%),  transparent); }
+ 
+    /* Bottom fade — bleeds into the next panel */
+    #opening::after  { bottom: 0; background: linear-gradient(to bottom, transparent, hsl(270,33%,8%)); }
+    #panel-1::after  { bottom: 0; background: linear-gradient(to bottom, transparent, hsl(270,34%,8%)); }
+    #panel-2::after  { bottom: 0; background: linear-gradient(to bottom, transparent, hsl(268,35%,7%)); }
+    #panel-3::after  { bottom: 0; background: linear-gradient(to bottom, transparent, hsl(266,36%,7%)); }
+    #panel-4::after  { bottom: 0; background: linear-gradient(to bottom, transparent, hsl(264,38%,6%)); }
+    #panel-5::after  { bottom: 0; background: linear-gradient(to bottom, transparent, hsl(262,40%,6%)); }
+    #panel-6::after  { bottom: 0; background: linear-gradient(to bottom, transparent, hsl(260,42%,5%)); }
+    #panel-7::after  { bottom: 0; background: linear-gradient(to bottom, transparent, hsl(258,44%,5%)); }
+ 
+    /* =============================================
+       LYRIC BLOCKS — the core text units
+    ============================================= */
+    .lyric-block {
+      text-align: center;
+      max-width: 680px;
+      position: relative;
+      z-index: 2;
+    }
+ 
+    .lyric-line {
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.45;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      opacity: 0;                          /* revealed by IntersectionObserver */
+      transform: translateY(18px);
+      transition:
+        opacity 1.2s ease,
+        transform 1.2s ease,
+        color 1s ease,
+        letter-spacing 1s ease,
+        filter 0.6s ease;
+      margin-bottom: 0.2em;
+    }
+ 
+    .lyric-line.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+ 
+    /* Small label above a lyric block */
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 2rem;
+      opacity: 0;
+      transition: opacity 1s ease 0.3s;
+    }
+    .section-label.visible { opacity: 1; }
+ 
+    /* =============================================
+       PARANOIA THOUGHT BUBBLES
+       Appear at medium-high paranoia, float around
+    ============================================= */
+    .thought {
+      position: fixed;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 50;
+      transition: opacity 1.2s ease;
+      white-space: nowrap;
+      letter-spacing: 0.05em;
+    }
+    .thought.active { opacity: 0.55; }
+ 
+    /* =============================================
+       CONFLICTING PHRASE PAIR
+       Two contradictory thoughts that appear simultaneously
+    ============================================= */
+    .conflict-pair {
+      display: flex;
+      gap: 4rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+ 
+    .conflict-a, .conflict-b {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      padding: 0.6em 1.2em;
+      border: 1px solid;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    .conflict-a {
+      color: var(--accent2);
+      border-color: var(--accent2);
+    }
+    .conflict-b {
+      color: var(--red);
+      border-color: var(--red);
+    }
+    .conflict-a.visible, .conflict-b.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+ 
+    /* =============================================
+       GLITCH TEXT EFFECT — CSS-only letter shift
+    ============================================= */
+    @keyframes glitch-shift {
+      0%   { clip-path: inset(0 0 95% 0); transform: translate(-3px, 0); }
+      20%  { clip-path: inset(30% 0 60% 0); transform: translate(3px, 0); }
+      40%  { clip-path: inset(60% 0 20% 0); transform: translate(-2px, 0); }
+      60%  { clip-path: inset(80% 0 5% 0); transform: translate(2px, 0); }
+      80%  { clip-path: inset(10% 0 80% 0); transform: translate(-1px, 0); }
+      100% { clip-path: inset(0 0 95% 0); transform: translate(0); }
+    }
+ 
+    .glitch-wrap {
+      position: relative;
+      display: inline-block;
+    }
+ 
+    /* The ::before and ::after are glitch ghost copies */
+    .glitch-wrap::before,
+    .glitch-wrap::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      opacity: var(--glitch-op);
+      font-style: italic;
+    }
+    .glitch-wrap::before {
+      color: var(--accent);
+      animation: glitch-shift 2.3s infinite linear;
+    }
+    .glitch-wrap::after {
+      color: var(--red);
+      animation: glitch-shift 3.1s infinite linear reverse;
+    }
+ 
+    /* =============================================
+       SHAKE ANIMATION — body trembles at peak paranoia
+    ============================================= */
+    @keyframes tremble {
+      0%   { transform: translate(0, 0); }
+      20%  { transform: translate(var(--shake-x), var(--shake-y)); }
+      40%  { transform: translate(calc(var(--shake-x) * -1), calc(var(--shake-y) * 0.5)); }
+      60%  { transform: translate(calc(var(--shake-x) * 0.5), var(--shake-y)); }
+      80%  { transform: translate(var(--shake-x), calc(var(--shake-y) * -1)); }
+      100% { transform: translate(0, 0); }
+    }
+ 
+    body.trembling {
+      animation: tremble 0.18s infinite ease-in-out;
+    }
+ 
+    /* =============================================
+       ECHO TEXT — duplicated ghost lines behind main text
+    ============================================= */
+    .echo {
+      position: absolute;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--accent);
+      opacity: 0;
+      pointer-events: none;
+      white-space: nowrap;
+      transition: opacity 2s ease;
+    }
+    .echo.active { opacity: 0.08; }
+ 
+    /* =============================================
+       FINAL CHAOS PANEL — everything breaks apart
+    ============================================= */
+    #chaos-panel {
+      background: var(--bg-warm);
+      position: relative;
+    }
+ 
+    .chaos-word {
+      position: absolute;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      color: var(--text);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.5s ease;
+      line-height: 1;
+    }
+    .chaos-word.visible { opacity: 1; }
+ 
+    /* =============================================
+       RESET BUTTON — appears after chaos
+    ============================================= */
+    #reset-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--dim);
+      background: none;
+      border: 1px solid var(--dim);
+      padding: 0.6em 1.6em;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 1s ease, color 0.3s, border-color 0.3s;
+      margin-top: 4rem;
+      position: relative;
+      z-index: 10;
+    }
+    #reset-btn:hover {
+      color: var(--text);
+      border-color: var(--text);
+    }
+    #reset-btn.visible { opacity: 1; }
+ 
+    /* =============================================
+       SEPARATOR LINE — elegant horizontal rule
+    ============================================= */
+    .sep {
+      width: 1px;
+      height: 80px;
+      background: linear-gradient(to bottom, transparent, var(--dim), transparent);
+      margin: 3rem auto;
+      opacity: 0;
+      transition: opacity 1s ease 0.5s;
+    }
+    .sep.visible { opacity: 1; }
+ 
+    /* =============================================
+       OPENING TITLE
+    ============================================= */
+    #opening {
+      background: radial-gradient(ellipse at 50% 60%,
+        #1c1029 0%, var(--bg) 70%);
+    }
+ 
+    #title-main {
+      font-size: clamp(3rem, 9vw, 7rem);
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      font-style: italic;
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1.8s ease 0.3s, transform 1.8s ease 0.3s;
+      text-align: center;
+    }
+    #title-main.visible { opacity: 1; transform: translateY(0); }
+ 
+    #title-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-top: 1.5rem;
+      opacity: 0;
+      transition: opacity 1.5s ease 1.2s;
+      text-align: center;
+    }
+    #title-sub.visible { opacity: 1; }
+ 
+    /* spinning ring behind title */
+    #orbit {
+      position: absolute;
+      width: min(60vw, 420px);
+      height: min(60vw, 420px);
+      border-radius: 50%;
+      border: 1px solid rgba(192,132,252,0.12);
+      animation: spin 28s linear infinite;
+      pointer-events: none;
+    }
+    #orbit::before {
+      content: '';
+      position: absolute;
+      top: -3px; left: 50%;
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 12px 4px var(--accent);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+ 
+    /* =============================================
+       CURSOR CORRUPTION — becomes unstable at high paranoia
+       We use a CSS class toggled by JS to swap cursor style
+    ============================================= */
+    body.cursor-uneasy  { cursor: crosshair; }
+    body.cursor-corrupt { cursor: none; }   /* hidden — replaced by JS follower div */
+ 
+    /* The fake cursor that lags behind and glitches */
+    #fake-cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.5s ease;
+      mix-blend-mode: screen;
+    }
+    #fake-cursor.active { opacity: 0.8; }
+ 
+    /* =============================================
+       RED BLEED — a warm crimson tint that seeps
+       in from the edges starting at panel 3
+    ============================================= */
+    #red-bleed {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 996;
+      opacity: 0;
+      background: radial-gradient(ellipse at 50% 100%,
+        rgba(200, 30, 30, 0.18) 0%,
+        transparent 65%
+      );
+      transition: opacity 3s ease;
+    }
+ 
+    /* =============================================
+       HEARTBEAT — lyric text gently pulses like a
+       racing heart, onset at paranoia > 20
+    ============================================= */
+    @keyframes heartbeat {
+      0%   { transform: translateY(0)   scale(1); }
+      14%  { transform: translateY(-1px) scale(1.004); }
+      28%  { transform: translateY(0)   scale(1); }
+      42%  { transform: translateY(-1px) scale(1.002); }
+      70%  { transform: translateY(0)   scale(1); }
+      100% { transform: translateY(0)   scale(1); }
+    }
+    .lyric-block.beating {
+      animation: heartbeat 1.4s ease-in-out infinite;
+    }
+ 
+    /* =============================================
+       PARANOIA METER — top right indicator
+    ============================================= */
+    #meter {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.3rem;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    #meter.visible { opacity: 1; }
+ 
+    #meter-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.25em;
+      color: var(--dim);
+      text-transform: uppercase;
+    }
+    #meter-track {
+      width: 80px;
+      height: 2px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    #meter-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--red));
+      border-radius: 2px;
+      transition: width 0.8s ease;
+    }
+ 
